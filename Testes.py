@@ -4,9 +4,12 @@ import random
 # Inicialização do Pygame
 pygame.init()
 
-# Definição das cores
+# Definição das cores dos jogadores
 BRANCO = (255, 255, 255)
 PRETO = (0, 0, 0)
+
+
+#Linhas do tabuleiro
 AZUL = (0, 0, 255)
 VERMELHO =(255,0,0)
 AMARELO =(255,255,0)
@@ -21,8 +24,12 @@ pygame.display.set_caption("Trilha")
 
 # Variáveis do jogo
 tabuleiro = [[' ']*8 for _ in range(7)]
+pecas_brancas_restantes = 9
+pecas_pretas_restantes = 9
+jogador_atual = 'B'  # Começa com as peças brancas
 
-jogador_atual = 'X'
+
+
 posicoes = [
     # Posições do cubo interno
     (largura_tela // 2 - 100, altura_tela // 2 - 100),
@@ -55,12 +62,6 @@ posicoes = [
     (largura_tela // 2 + 300, altura_tela // 2 + 300)
 ]
 
-
-fase_colocacao = True
-pecas_brancas = 9
-pecas_pretas = 9
-fase_movimento = False
-pecas_selecionadas = []
 
 def desenhar_linhas_cubos():
     # Desenho do tabuleiro, segue a ordem em sentido horário
@@ -103,107 +104,38 @@ def exibir_tabuleiro():
         coluna = i % 8
         texto = fonte.render(tabuleiro[linha][coluna], True, PRETO)
         tela.blit(texto, (posicoes[i][0] - 15, posicoes[i][1] - 15))
+    
+    # Exibir mensagem de quem é a vez
+    mensagem = f"Vez do jogador {jogador_atual}"
+    fonte_mensagem = pygame.font.Font(None, 30)
+    texto_mensagem = fonte_mensagem.render(mensagem, True, BRANCO)
+    largura_texto = texto_mensagem.get_width()
+    altura_texto = texto_mensagem.get_height()
+    pos_x_mensagem = largura_tela // 2 - largura_texto // 2
+    pos_y_mensagem = altura_tela // 2 - altura_texto // 2 - 50 -350
+    tela.blit(texto_mensagem, (pos_x_mensagem, pos_y_mensagem))
 
 
-# Função para verificar se a posição é válida
 def posicao_valida(linha, coluna):
-    if linha < 0 or linha > 6 or coluna < 0 or coluna > 7:
+    # Verifica se a posição está dentro dos limites do tabuleiro
+    if linha < 0 or linha >= len(tabuleiro) or coluna < 0 or coluna >= len(tabuleiro[0]):
         return False
+    # Verifica se a posição está vazia
     if tabuleiro[linha][coluna] != ' ':
         return False
+    # Verifica se a posição respeita as regras de colocação (por exemplo, não está na linha externa do tabuleiro)
+    # Adicione aqui as regras específicas do seu jogo
+    # ...
     return True
 
-# Função para fazer uma jogada
-def fazer_jogada(linha, coluna):
-    global fase_colocacao, pecas_brancas, pecas_pretas, fase_movimento, jogador_atual
 
-    if fase_colocacao:
-        if posicao_valida(linha, coluna):
-            tabuleiro[linha][coluna] = jogador_atual
-            if jogador_atual == 'X':
-                pecas_brancas -= 1
-            else:
-                pecas_pretas -= 1
 
-            # Verificar se há um moinho
-            if verificar_moinho(linha, coluna):
-                fase_movimento = True
-                pecas_selecionadas.clear()
 
-            # Trocar de jogador
-            if pecas_brancas == 0 and pecas_pretas == 0:
-                fase_colocacao = False
-                jogador_atual = 'X'  # Reiniciar com as peças pretas
-            else:
-                if jogador_atual == 'X':
-                    jogador_atual = 'O'
-                else:
-                    jogador_atual = 'X'
-           
-    elif fase_movimento:
-            if tabuleiro[linha][coluna] == jogador_atual and verificar_moinho(linha, coluna):
-                return
-    
-            if tabuleiro[linha][coluna] == jogador_atual:
-                pecas_selecionadas.append((linha, coluna))
-    
-                if len(pecas_selecionadas) == 2:
-                    linha_origem, coluna_origem = pecas_selecionadas[0]
-                    linha_destino, coluna_destino = pecas_selecionadas[1]
-    
-                    if movimento_valido(linha_origem, coluna_origem, linha_destino, coluna_destino):
-                        tabuleiro[linha_destino][coluna_destino] = jogador_atual
-                        tabuleiro[linha_origem][coluna_origem] = ' '
-                        pecas_selecionadas.clear()
-    
-                        if verificar_moinho(linha_destino, coluna_destino):
-                            fase_remocao = True
-    
-                        # Trocar de jogador
-                        if jogador_atual == 'X':
-                            jogador_atual = 'O'
-                        else:
-                            jogador_atual = 'X'
-            else:
-                pecas_selecionadas.clear()
-
-# Função para verificar se há um moinho
-def verificar_moinho(linha, coluna):
-    peca = tabuleiro[linha][coluna]
-    # Verificar linha
-    if tabuleiro[linha][0] == tabuleiro[linha][1] == tabuleiro[linha][2] == peca:
-        return True
-    # Verificar coluna
-    if tabuleiro[0][coluna] == tabuleiro[1][coluna] == tabuleiro[2][coluna] == peca:
-        return True
-    # Verificar diagonais
-    if (linha, coluna) in [(0, 0), (0, 2), (1, 1), (2, 0), (2, 2)]:
-        if tabuleiro[0][0] == tabuleiro[1][1] == tabuleiro[2][2] == peca:
-            return True
-        if tabuleiro[2][0] == tabuleiro[1][1] == tabuleiro[0][2] == peca:
-            return True
-    return False
-
-# Função para verificar se um movimento é válido
-def movimento_valido(linha_origem, coluna_origem, linha_destino, coluna_destino):
-    if tabuleiro[linha_origem][coluna_origem] == jogador_atual and tabuleiro[linha_destino][coluna_destino] == ' ':
-        # Movimento vertical
-        if coluna_origem == coluna_destino and abs(linha_origem - linha_destino) == 1:
-            return True
-        # Movimento horizontal
-        if linha_origem == linha_destino and abs(coluna_origem - coluna_destino) == 1:
-            return True
-        # Movimento diagonal
-        if (linha_origem, coluna_origem) in [(0, 0), (0, 2), (2, 0), (2, 2)] and (linha_destino, coluna_destino) == (1, 1):
-            return True
-        if (linha_origem, coluna_origem) == (1, 1) and (linha_destino, coluna_destino) in [(0, 0), (0, 2), (2, 0), (2, 2)]:
-            return True
-    return False
 
 
 # Função principal do jogo
 def jogar():
-    global jogador_atual
+    global jogador_atual, pecas_brancas_restantes, pecas_pretas_restantes
 
     while True:
         for evento in pygame.event.get():
@@ -211,16 +143,38 @@ def jogar():
                 pygame.quit()
                 return
 
-            if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
-                pos = pygame.mouse.get_pos()
-                coluna = (pos[0] - 100) // 200
-                linha = (pos[1] - 100) // 200
+        if pecas_brancas_restantes > 0 and jogador_atual == 'B':
+            for evento in pygame.event.get():
+                if evento.type == pygame.MOUSEBUTTONDOWN:
+                    x, y = evento.pos
+                    for i in range(24):
+                        pos_x, pos_y = posicoes[i]
+                        if abs(x - pos_x) < 20 and abs(y - pos_y) < 20:
+                            linha = i // 8
+                            coluna = i % 8
+                            if posicao_valida(linha, coluna):
+                                tabuleiro[linha][coluna] = 'B'
+                                pecas_brancas_restantes -= 1
+                                jogador_atual = 'P'
+                                break
 
-                if 0 <= linha < 7 and 0 <= coluna < 8:
-                    fazer_jogada(linha, coluna)
+        if pecas_pretas_restantes > 0 and jogador_atual == 'P':
+            for evento in pygame.event.get():
+                if evento.type == pygame.MOUSEBUTTONDOWN:
+                    x, y = evento.pos
+                    for i in range(24):
+                        pos_x, pos_y = posicoes[i]
+                        if abs(x - pos_x) < 20 and abs(y - pos_y) < 20:
+                            linha = i // 8
+                            coluna = i % 8
+                            if posicao_valida(linha, coluna):
+                                tabuleiro[linha][coluna] = 'P'
+                                pecas_pretas_restantes -= 1
+                                jogador_atual = 'B'
+                                break
 
         exibir_tabuleiro()
         pygame.display.flip()
-
-# Executar o jogo
+        #Executar
 jogar()
+
