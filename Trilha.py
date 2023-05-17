@@ -4,15 +4,17 @@ import random
 # Inicialização do Pygame
 pygame.init()
 
-# Definição das cores
+# Definição das cores dos jogadores
 BRANCO = (255, 255, 255)
 PRETO = (0, 0, 0)
+
+# Linhas do tabuleiro
 AZUL = (0, 0, 255)
-VERMELHO =(255,0,0)
-AMARELO =(255,255,0)
+VERMELHO = (255, 0, 0)
+AMARELO = (255, 255, 0)
 
 # Dimensões da tela
-largura_tela = 900            
+largura_tela = 900
 altura_tela = 900
 
 # Criando a tela
@@ -21,8 +23,10 @@ pygame.display.set_caption("Trilha")
 
 # Variáveis do jogo
 tabuleiro = [[' ']*8 for _ in range(7)]
+pecas_brancas_restantes = 9
+pecas_pretas_restantes = 9
+jogador_atual = 'B'  # Começa com as peças brancas
 
-jogador_atual = 'X'
 posicoes = [
     # Posições do cubo interno
     (largura_tela // 2 - 100, altura_tela // 2 - 100),
@@ -56,39 +60,48 @@ posicoes = [
 ]
 
 
-fase_colocacao = True
-pecas_brancas = 9
-pecas_pretas = 9
-fase_movimento = False
-pecas_selecionadas = []
-
 def desenhar_linhas_cubos():
     # Desenho do tabuleiro, segue a ordem em sentido horário
 
     # Cubo vermelho (Menor)
-    pygame.draw.lines(tela, VERMELHO, True, [posicoes[0], posicoes[1], posicoes[2]], 2) # Linha superior
-    pygame.draw.lines(tela, VERMELHO, True, [posicoes[2], posicoes[4], posicoes[7]], 2) # Linha direita
-    pygame.draw.lines(tela, VERMELHO, True, [posicoes[7], posicoes[6], posicoes[5]], 2) # Linha inferior
-    pygame.draw.lines(tela, VERMELHO, True, [posicoes[5], posicoes[3], posicoes[0]], 2) # Linha esquerda
+    pygame.draw.lines(tela, VERMELHO, True, [
+                      posicoes[0], posicoes[1], posicoes[2]], 2)  # Linha superior
+    pygame.draw.lines(tela, VERMELHO, True, [
+                      posicoes[2], posicoes[4], posicoes[7]], 2)  # Linha direita
+    pygame.draw.lines(tela, VERMELHO, True, [
+                      posicoes[7], posicoes[6], posicoes[5]], 2)  # Linha inferior
+    pygame.draw.lines(tela, VERMELHO, True, [
+                      posicoes[5], posicoes[3], posicoes[0]], 2)  # Linha esquerda
 
     # Cubo azul (Do meio)
-    pygame.draw.lines(tela, AZUL, True, [posicoes[8], posicoes[9], posicoes[10]], 2) # Linha superior
-    pygame.draw.lines(tela, AZUL, True, [posicoes[10], posicoes[12], posicoes[15]], 2) # Linha direita
-    pygame.draw.lines(tela, AZUL, True, [posicoes[15], posicoes[14], posicoes[13]], 2) # Linha inferior
-    pygame.draw.lines(tela, AZUL, True, [posicoes[13], posicoes[11], posicoes[8]], 2) # Linha esquerda
-
+    pygame.draw.lines(tela, AZUL, True, [
+                      posicoes[8], posicoes[9], posicoes[10]], 2)  # Linha superior
+    pygame.draw.lines(tela, AZUL, True, [
+                      posicoes[10], posicoes[12], posicoes[15]], 2)  # Linha direita
+    pygame.draw.lines(tela, AZUL, True, [
+                      posicoes[15], posicoes[14], posicoes[13]], 2)  # Linha inferior
+    pygame.draw.lines(tela, AZUL, True, [
+                      posicoes[13], posicoes[11], posicoes[8]], 2)  # Linha esquerda
 
     # Cubo Vermelho (Maior)
-    pygame.draw.lines(tela, BRANCO, True, [posicoes[16], posicoes[17], posicoes[18]], 2) # Linha superior
-    pygame.draw.lines(tela, BRANCO, True, [posicoes[18], posicoes[20], posicoes[23]], 2) # Linha direita
-    pygame.draw.lines(tela, BRANCO, True, [posicoes[23], posicoes[22], posicoes[21]], 2) # Linha inferior
-    pygame.draw.lines(tela, BRANCO, True, [posicoes[21], posicoes[19], posicoes[16]], 2) # Linha esquerda
+    pygame.draw.lines(tela, BRANCO, True, [
+                      posicoes[16], posicoes[17], posicoes[18]], 2)  # Linha superior
+    pygame.draw.lines(tela, BRANCO, True, [
+                      posicoes[18], posicoes[20], posicoes[23]], 2)  # Linha direita
+    pygame.draw.lines(tela, BRANCO, True, [
+                      posicoes[23], posicoes[22], posicoes[21]], 2)  # Linha inferior
+    pygame.draw.lines(tela, BRANCO, True, [
+                      posicoes[21], posicoes[19], posicoes[16]], 2)  # Linha esquerda
 
     # Linhas de Ligamento (Em amarelo)
-    pygame.draw.lines(tela, AMARELO, True, [posicoes[17], posicoes[9], posicoes[1]], 2) # Linha superior
-    pygame.draw.lines(tela, AMARELO, True, [posicoes[20], posicoes[12], posicoes[4]], 2) # Linha direita
-    pygame.draw.lines(tela, AMARELO, True, [posicoes[22], posicoes[14], posicoes[6]], 2) # Linha inferior
-    pygame.draw.lines(tela, AMARELO, True, [posicoes[19], posicoes[11], posicoes[3]], 2) # Linha esquerda
+    pygame.draw.lines(tela, AMARELO, True, [
+                      posicoes[17], posicoes[9], posicoes[1]], 2)  # Linha superior
+    pygame.draw.lines(tela, AMARELO, True, [
+                      posicoes[20], posicoes[12], posicoes[4]], 2)  # Linha direita
+    pygame.draw.lines(tela, AMARELO, True, [
+                      posicoes[22], posicoes[14], posicoes[6]], 2)  # Linha inferior
+    pygame.draw.lines(tela, AMARELO, True, [
+                      posicoes[19], posicoes[11], posicoes[3]], 2)  # Linha esquerda
 
 
 # Função para exibir o tabuleiro
@@ -101,126 +114,153 @@ def exibir_tabuleiro():
         fonte = pygame.font.Font(None, 50)
         linha = i // 8
         coluna = i % 8
-        texto = fonte.render(tabuleiro[linha][coluna], True, PRETO)
-        tela.blit(texto, (posicoes[i][0] - 15, posicoes[i][1] - 15))
+
+        # Substituir "B" por "X" e "P" por "O"
+        texto = tabuleiro[linha][coluna]
+        if texto == 'B':
+            texto = 'X'
+        elif texto == 'P':
+            texto = 'O'
+
+        texto_renderizado = fonte.render(texto, True, PRETO)
+        tela.blit(texto_renderizado,
+                  (posicoes[i][0] - 15, posicoes[i][1] - 15))
+
+        # Mostrar o índice (linha, coluna) acima do ponto branco
+        if texto == ' ':
+            indice_renderizado = fonte.render(
+                f"({linha}, {coluna})", True, (255, 255, 255))
+            tela.blit(indice_renderizado,
+                      (posicoes[i][0] - 30, posicoes[i][1] - 40))
 
 
-# Função para verificar se a posição é válida
 def posicao_valida(linha, coluna):
-    if linha < 0 or linha > 6 or coluna < 0 or coluna > 7:
+    # Verifica se a posição está dentro dos limites do tabuleiro
+    if linha < 0 or linha > 2 or coluna < 0 or coluna > 7:
         return False
+    # Verifica se a posição está vazia
     if tabuleiro[linha][coluna] != ' ':
         return False
+    # Verifica se a posição respeita as regras de colocação (por exemplo, não está na linha externa do tabuleiro)
+    # Adicione aqui as regras específicas do seu jogo
+    # ...
     return True
 
-# Função para fazer uma jogada
-def fazer_jogada(linha, coluna):
-    global fase_colocacao, pecas_brancas, pecas_pretas, fase_movimento, jogador_atual
 
-    if fase_colocacao:
-        if posicao_valida(linha, coluna):
-            tabuleiro[linha][coluna] = jogador_atual
-            if jogador_atual == 'X':
-                pecas_brancas -= 1
+def posicao_aleatoria():
+    linha = random.randint(0, len(tabuleiro) - 1)
+    coluna = random.randint(0, len(tabuleiro[0]) - 1)
+    while not posicao_valida(linha, coluna):
+        linha = random.randint(0, len(tabuleiro) - 1)
+        coluna = random.randint(0, len(tabuleiro[0]) - 1)
+    return linha, coluna
+
+
+def trocar_jogador():
+    global jogador_atual
+    if jogador_atual == 'B':
+        jogador_atual = 'P'
+    else:
+        jogador_atual = 'B'
+
+
+def obter_posicoes_disponiveis():
+    posicoes_disponiveis = []
+    for linha in range(len(tabuleiro)):
+        for coluna in range(len(tabuleiro[linha])):
+            if tabuleiro[linha][coluna] == ' ':
+                posicoes_disponiveis.append((linha, coluna))
+    return posicoes_disponiveis
+
+
+def jogada_aleatoria():
+    global pecas_pretas_restantes
+
+    if pecas_pretas_restantes == 0:
+        return
+
+    posicoes_disponiveis = obter_posicoes_disponiveis()
+
+    if len(posicoes_disponiveis) > 0:
+        jogada_valida = False
+
+        while not jogada_valida:
+            indice_aleatorio = random.randint(0, len(posicoes_disponiveis) - 1)
+            linha, coluna = posicoes_disponiveis[indice_aleatorio]
+
+            if posicao_valida(linha, coluna):
+                tabuleiro[linha][coluna] = jogador_atual
+                pecas_pretas_restantes -= 1
+                jogada_valida = True
+                registrar_log_jogada(linha, coluna, True)
             else:
-                pecas_pretas -= 1
+                posicoes_disponiveis.pop(indice_aleatorio)
 
-            # Verificar se há um moinho
-            if verificar_moinho(linha, coluna):
-                fase_movimento = True
-                pecas_selecionadas.clear()
 
-            # Trocar de jogador
-            if pecas_brancas == 0 and pecas_pretas == 0:
-                fase_colocacao = False
-                jogador_atual = 'X'  # Reiniciar com as peças pretas
-            else:
-                if jogador_atual == 'X':
-                    jogador_atual = 'O'
-                else:
-                    jogador_atual = 'X'
-           
-    elif fase_movimento:
-            if tabuleiro[linha][coluna] == jogador_atual and verificar_moinho(linha, coluna):
-                return
-    
-            if tabuleiro[linha][coluna] == jogador_atual:
-                pecas_selecionadas.append((linha, coluna))
-    
-                if len(pecas_selecionadas) == 2:
-                    linha_origem, coluna_origem = pecas_selecionadas[0]
-                    linha_destino, coluna_destino = pecas_selecionadas[1]
-    
-                    if movimento_valido(linha_origem, coluna_origem, linha_destino, coluna_destino):
-                        tabuleiro[linha_destino][coluna_destino] = jogador_atual
-                        tabuleiro[linha_origem][coluna_origem] = ' '
-                        pecas_selecionadas.clear()
-    
-                        if verificar_moinho(linha_destino, coluna_destino):
-                            fase_remocao = True
-    
-                        # Trocar de jogador
-                        if jogador_atual == 'X':
-                            jogador_atual = 'O'
-                        else:
-                            jogador_atual = 'X'
-            else:
-                pecas_selecionadas.clear()
-
-# Função para verificar se há um moinho
-def verificar_moinho(linha, coluna):
-    peca = tabuleiro[linha][coluna]
-    # Verificar linha
-    if tabuleiro[linha][0] == tabuleiro[linha][1] == tabuleiro[linha][2] == peca:
-        return True
-    # Verificar coluna
-    if tabuleiro[0][coluna] == tabuleiro[1][coluna] == tabuleiro[2][coluna] == peca:
-        return True
-    # Verificar diagonais
-    if (linha, coluna) in [(0, 0), (0, 2), (1, 1), (2, 0), (2, 2)]:
-        if tabuleiro[0][0] == tabuleiro[1][1] == tabuleiro[2][2] == peca:
-            return True
-        if tabuleiro[2][0] == tabuleiro[1][1] == tabuleiro[0][2] == peca:
-            return True
-    return False
-
-# Função para verificar se um movimento é válido
-def movimento_valido(linha_origem, coluna_origem, linha_destino, coluna_destino):
-    if tabuleiro[linha_origem][coluna_origem] == jogador_atual and tabuleiro[linha_destino][coluna_destino] == ' ':
-        # Movimento vertical
-        if coluna_origem == coluna_destino and abs(linha_origem - linha_destino) == 1:
-            return True
-        # Movimento horizontal
-        if linha_origem == linha_destino and abs(coluna_origem - coluna_destino) == 1:
-            return True
-        # Movimento diagonal
-        if (linha_origem, coluna_origem) in [(0, 0), (0, 2), (2, 0), (2, 2)] and (linha_destino, coluna_destino) == (1, 1):
-            return True
-        if (linha_origem, coluna_origem) == (1, 1) and (linha_destino, coluna_destino) in [(0, 0), (0, 2), (2, 0), (2, 2)]:
-            return True
-    return False
+def registrar_log_jogada(linha, coluna, jogada_valida):
+    if jogada_valida:
+        print(f"Robô: Jogada válida na posição ({linha}, {coluna})")
+    else:
+        print("Robô: Não foi possível realizar uma jogada válida")
 
 
 # Função principal do jogo
 def jogar():
-    global jogador_atual
+    global jogador_atual, pecas_brancas_restantes, pecas_pretas_restantes
 
-    while True:
+    rodando = True  # Variável para controlar o loop principal do jogo
+
+    while rodando:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                pygame.quit()
-                return
-
-            if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
-                pos = pygame.mouse.get_pos()
-                coluna = (pos[0] - 100) // 200
-                linha = (pos[1] - 100) // 200
-
-                if 0 <= linha < 7 and 0 <= coluna < 8:
-                    fazer_jogada(linha, coluna)
+                rodando = False  # Definir como False para sair do loop principal
+            elif evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_ESCAPE:
+                    rodando = False  # Definir como False para sair do loop principal
 
         exibir_tabuleiro()
         pygame.display.flip()
+
+        if pecas_brancas_restantes == 0 and pecas_pretas_restantes == 0:
+            # Fim do jogo
+            rodando = False
+        elif jogador_atual == 'B':
+            if pecas_brancas_restantes > 0:
+                for evento in pygame.event.get():
+                    if evento.type == pygame.MOUSEBUTTONDOWN:
+                        x, y = evento.pos
+                        for i in range(24):
+                            pos_x, pos_y = posicoes[i]
+                            if abs(x - pos_x) < 20 and abs(y - pos_y) < 20:
+                                linha = i // 8
+                                coluna = i % 8
+                                if posicao_valida(linha, coluna):
+                                    if tabuleiro[linha][coluna] == ' ':
+                                        tabuleiro[linha][coluna] = jogador_atual
+                                        pecas_brancas_restantes -= 1
+                                        trocar_jogador()
+                                        exibir_tabuleiro()
+                                        pygame.display.flip()
+                                        break
+            else:
+                jogador_atual = 'P'
+        elif jogador_atual == 'P':
+            if pecas_pretas_restantes > 0:
+                jogada_aleatoria()
+                exibir_tabuleiro()
+                pygame.display.flip()
+            else:
+                jogador_atual = 'B'
+
+    # Resultado final do jogo
+    exibir_tabuleiro()
+    pygame.display.flip()
+
+    if pecas_brancas_restantes == 0 and pecas_pretas_restantes == 0:
+        print("Fim do jogo. Ambos os jogadores colocaram todas as peças.")
+
+    pygame.quit()  # Fechar o Pygame ao sair do loop principal
+
 
 # Executar o jogo
 jogar()
