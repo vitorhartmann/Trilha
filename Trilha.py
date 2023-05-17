@@ -136,6 +136,12 @@ def exibir_tabuleiro():
     pos_y_mensagem = altura_tela // 2 - altura_texto // 2 - 50 - 350
     tela.blit(texto_mensagem, (pos_x_mensagem, pos_y_mensagem))
 
+    # Exibir quantidade de peças disponíveis
+    fonte_peca = pygame.font.Font(None, 30)
+    texto_pecas = fonte_peca.render(
+        f"P: {pecas_pretas_restantes}  B: {pecas_brancas_restantes}", True, BRANCO)
+    tela.blit(texto_pecas, (10, 10))
+
 
 def posicao_valida(linha, coluna):
     # Verifica se a posição está dentro dos limites do tabuleiro
@@ -176,26 +182,8 @@ def obter_posicoes_disponiveis():
     return posicoes_disponiveis
 
 
-def jogada_aleatoria():
-    global pecas_pretas_restantes
-
-    while pecas_pretas_restantes > 0:
-        posicoes_disponiveis = obter_posicoes_disponiveis()
-
-        if len(posicoes_disponiveis) > 0:
-            indice_aleatorio = random.randint(0, len(posicoes_disponiveis) - 1)
-            linha, coluna = posicoes_disponiveis[indice_aleatorio]
-
-            if posicao_valida(linha, coluna):
-                tabuleiro[linha][coluna] = jogador_atual
-                pecas_pretas_restantes -= 1
-                registrar_log_jogada(linha, coluna, True)
-                break
-            else:
-                registrar_log_jogada(linha, coluna, False)
-
-        exibir_tabuleiro()
-        pygame.display.flip()
+exibir_tabuleiro()
+pygame.display.flip()
 
 
 def registrar_log_jogada(linha, coluna, jogada_valida):
@@ -203,6 +191,62 @@ def registrar_log_jogada(linha, coluna, jogada_valida):
         print(f"Robô: Jogada válida na posição ({linha}, {coluna})")
     else:
         print("Robô: Não foi possível realizar uma jogada válida")
+
+
+def avaliar_situacao_atual(tabuleiro, jogador):
+    posicoes_jogador = []
+
+    for linha in range(len(tabuleiro)):
+        for coluna in range(len(tabuleiro[linha])):
+            if tabuleiro[linha][coluna] == jogador:
+                posicoes_jogador.append((linha, coluna))
+
+    return posicoes_jogador
+
+
+def gerar_jogadas_possiveis(tabuleiro):
+    jogadas_possiveis = []
+
+    for linha in range(len(tabuleiro)):
+        for coluna in range(len(tabuleiro[linha])):
+            if tabuleiro[linha][coluna] == ' ':
+                jogadas_possiveis.append((linha, coluna))
+
+    return jogadas_possiveis
+
+
+def avaliar_jogada(jogada, posicoes_jogador):
+    pontuacao = 0
+
+    for posicao in posicoes_jogador:
+        distancia = abs(posicao[0] - jogada[0]) + abs(posicao[1] - jogada[1])
+        pontuacao += distancia
+
+    return pontuacao
+
+
+def escolher_melhor_jogada(tabuleiro, jogador):
+    posicoes_jogador = avaliar_situacao_atual(tabuleiro, jogador)
+    jogadas_possiveis = gerar_jogadas_possiveis(tabuleiro)
+
+    melhor_jogada = None
+    melhor_pontuacao = float('-inf')
+
+    for jogada in jogadas_possiveis:
+        pontuacao = avaliar_jogada(jogada, posicoes_jogador)
+        if pontuacao > melhor_pontuacao:
+            melhor_jogada = jogada
+            melhor_pontuacao = pontuacao
+
+    return melhor_jogada
+
+
+def tentar_colocar_peca(linha, coluna):
+    if posicao_valida(linha, coluna):
+        if tabuleiro[linha][coluna] == ' ':
+            tabuleiro[linha][coluna] = jogador_atual
+            return True
+    return False
 
 
 # Função principal do jogo
@@ -246,12 +290,45 @@ def jogar():
                 jogador_atual = 'P'
         elif jogador_atual == 'P':
             if pecas_pretas_restantes > 0:
-                jogada_aleatoria()
-                trocar_jogador()
-                exibir_tabuleiro()
-                pygame.display.flip()
+                jogada = escolher_melhor_jogada(tabuleiro, jogador_atual)
+                if jogada is not None:
+                    linha, coluna = jogada
+                    if tentar_colocar_peca(linha, coluna):
+                        pecas_pretas_restantes -= 1
+                        trocar_jogador()
+                    else:
+                        print("IA: Jogada inválida. Tentando nova jogada...")
+                        jogada_valida = False
+                        while not jogada_valida:
+                            nova_jogada = escolher_melhor_jogada(
+                                tabuleiro, jogador_atual)
+                            if nova_jogada is not None:
+                                nova_linha, nova_coluna = nova_jogada
+                                if tentar_colocar_peca(nova_linha, nova_coluna):
+                                    jogada_valida = True
+                                    pecas_pretas_restantes -= 1
+                                    trocar_jogador()
+                                    print(
+                                        f"IA: Jogada válida na posição ({nova_linha}, {nova_coluna})")
+                            else:
+                                jogada_valida = True
+                                print(
+                                    "IA: Não foi possível realizar uma jogada válida.")
+                                trocar_jogador()
+                    exibir_tabuleiro()
+                    pygame.display.flip()
+                else:
+                    print("IA: Não foi possível realizar uma jogada válida.")
+                    jogador_atual = 'B'
             else:
                 jogador_atual = 'B'
+                jogada = escolher_melhor_jogada(tabuleiro, jogador_atual)
+                if jogada is not None:
+                    linha, coluna = jogada
+                    if tentar_colocar_peca(linha, coluna):
+                        pecas_brancas_restantes -= 1
+                    exibir_tabuleiro()
+                    pygame.display.flip()
 
     exibir_tabuleiro()
     pygame.display.flip()
