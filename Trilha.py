@@ -179,25 +179,23 @@ def obter_posicoes_disponiveis():
 def jogada_aleatoria():
     global pecas_pretas_restantes
 
-    if pecas_pretas_restantes == 0:
-        return
+    while pecas_pretas_restantes > 0:
+        posicoes_disponiveis = obter_posicoes_disponiveis()
 
-    posicoes_disponiveis = obter_posicoes_disponiveis()
-
-    if len(posicoes_disponiveis) > 0:
-        jogada_valida = False
-
-        while not jogada_valida:
+        if len(posicoes_disponiveis) > 0:
             indice_aleatorio = random.randint(0, len(posicoes_disponiveis) - 1)
             linha, coluna = posicoes_disponiveis[indice_aleatorio]
 
             if posicao_valida(linha, coluna):
                 tabuleiro[linha][coluna] = jogador_atual
                 pecas_pretas_restantes -= 1
-                jogada_valida = True
                 registrar_log_jogada(linha, coluna, True)
+                break
             else:
-                posicoes_disponiveis.pop(indice_aleatorio)
+                registrar_log_jogada(linha, coluna, False)
+
+        exibir_tabuleiro()
+        pygame.display.flip()
 
 
 def registrar_log_jogada(linha, coluna, jogada_valida):
@@ -211,21 +209,20 @@ def registrar_log_jogada(linha, coluna, jogada_valida):
 def jogar():
     global jogador_atual, pecas_brancas_restantes, pecas_pretas_restantes
 
-    rodando = True  # Variável para controlar o loop principal do jogo
+    rodando = True
 
     while rodando:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                rodando = False  # Definir como False para sair do loop principal
+                rodando = False
             elif evento.type == pygame.KEYDOWN:
                 if evento.key == pygame.K_ESCAPE:
-                    rodando = False  # Definir como False para sair do loop principal
+                    rodando = False
 
         exibir_tabuleiro()
         pygame.display.flip()
 
         if pecas_brancas_restantes == 0 and pecas_pretas_restantes == 0:
-            # Fim do jogo
             rodando = False
         elif jogador_atual == 'B':
             if pecas_brancas_restantes > 0:
@@ -250,19 +247,19 @@ def jogar():
         elif jogador_atual == 'P':
             if pecas_pretas_restantes > 0:
                 jogada_aleatoria()
+                trocar_jogador()
                 exibir_tabuleiro()
                 pygame.display.flip()
             else:
                 jogador_atual = 'B'
 
-    # Resultado final do jogo
     exibir_tabuleiro()
     pygame.display.flip()
 
     if pecas_brancas_restantes == 0 and pecas_pretas_restantes == 0:
         print("Fim do jogo. Ambos os jogadores colocaram todas as peças.")
 
-    pygame.quit()  # Fechar o Pygame ao sair do loop principal
+    pygame.quit()
 
 
 # Executar o jogo
