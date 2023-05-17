@@ -126,20 +126,17 @@ def exibir_tabuleiro():
         tela.blit(texto_renderizado,
                   (posicoes[i][0] - 15, posicoes[i][1] - 15))
 
-    # Exibir mensagem de quem é a vez
-    mensagem = f"Vez do jogador {jogador_atual}"
-    fonte_mensagem = pygame.font.Font(None, 30)
-    texto_mensagem = fonte_mensagem.render(mensagem, True, BRANCO)
-    largura_texto = texto_mensagem.get_width()
-    altura_texto = texto_mensagem.get_height()
-    pos_x_mensagem = largura_tela // 2 - largura_texto // 2
-    pos_y_mensagem = altura_tela // 2 - altura_texto // 2 - 50 - 350
-    tela.blit(texto_mensagem, (pos_x_mensagem, pos_y_mensagem))
+        # Mostrar o índice (linha, coluna) acima do ponto branco
+        if texto == ' ':
+            indice_renderizado = fonte.render(
+                f"({linha}, {coluna})", True, (255, 255, 255))
+            tela.blit(indice_renderizado,
+                      (posicoes[i][0] - 30, posicoes[i][1] - 40))
 
 
 def posicao_valida(linha, coluna):
     # Verifica se a posição está dentro dos limites do tabuleiro
-    if linha < 0 or linha >= len(tabuleiro) or coluna < 0 or coluna >= len(tabuleiro[0]):
+    if linha < 0 or linha > 2 or coluna < 0 or coluna > 7:
         return False
     # Verifica se a posição está vazia
     if tabuleiro[linha][coluna] != ' ':
