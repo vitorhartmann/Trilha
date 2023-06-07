@@ -66,20 +66,45 @@ posicoes = [
     (largura_tela // 2, altura_tela // 2 + 300),  # 22
     (largura_tela // 2 + 300, altura_tela // 2 + 300),  # 23
     
-    
-    
-    
 ]
 
+# Definição das conexões entre as posições
+conexoes = {
+    0: [1, 9],
+    1: [0, 2, 4],
+    2: [1, 14],
+    3: [4, 10],
+    4: [1, 3, 5, 7],
+    5: [4, 13],
+    6: [7, 11],
+    7: [4, 6, 8],
+    8: [7, 12],
+    9: [0, 10, 21],
+    10: [3, 9, 11, 18],
+    11: [6, 10, 15],
+    12: [8, 13, 17],
+    13: [5, 12, 14, 20],
+    14: [2, 13, 23],
+    15: [11, 16],
+    16: [15, 17, 19],
+    17: [12, 16],
+    18: [10, 19],
+    19: [16, 18, 20, 22],
+    20: [13, 19],
+    21: [9, 22],
+    22: [19, 21, 23],
+    23: [14, 22]
+}
 
-
+fase_colocacao = True
+fase_movimentacao = False
+linha_destino = -1
+coluna_destino = -1
 
 def desenhar_linhas_cubos():
     # Desenho do tabuleiro, segue a ordem em sentido horário
 
-    
     # Linhas Horizontais
-
     pygame.draw.lines(tela, AZUL, True, [
                       posicoes[0], posicoes[1], posicoes[2]], 2) 
     pygame.draw.lines(tela, AZUL, True, [
@@ -117,9 +142,6 @@ def desenhar_linhas_cubos():
     pygame.draw.lines(tela, AZUL, True, [
                       posicoes[2], posicoes[14], posicoes[23]], 2)      
 
-    
-
-
 
 # Função para exibir o tabuleiro
 def exibir_tabuleiro():
@@ -145,8 +167,6 @@ def exibir_tabuleiro():
         # Mostrar o número da posição
         texto_posicao = fonte.render(str(i), True, PRETO)
         tela.blit(texto_posicao, (posicoes[i][0] - 7, posicoes[i][1] - 7))
-
-
 
     # Exibir mensagem de quem é a vez
     mensagem = f"Vez do jogador {jogador_atual}"
@@ -174,7 +194,6 @@ def posicao_valida(linha, coluna):
         return False
     # Verifica se a posição respeita as regras de colocação (unica regra atual, é quando tem alguma peça lá)
     # Adicione aqui as regras específicas do jogo
-
     return True
 
 
@@ -258,7 +277,7 @@ def tentar_colocar_peca(linha, coluna):
 
 # Função principal do jogo
 def jogar():
-    global jogador_atual, pecas_brancas_restantes, pecas_pretas_restantes
+    global jogador_atual, pecas_brancas_restantes, pecas_pretas_restantes, fase_colocacao, fase_movimentacao, linha_destino, coluna_destino
 
     rodando = True
 
@@ -274,77 +293,73 @@ def jogar():
         pygame.display.flip()
 
         if pecas_brancas_restantes == 0 and pecas_pretas_restantes == 0:
-            rodando = False
-        elif jogador_atual == 'B':
-            if pecas_brancas_restantes > 0:
-                for evento in pygame.event.get():
-                    if evento.type == pygame.MOUSEBUTTONDOWN:
-                        x, y = evento.pos
-                        for i in range(24):
-                            pos_x, pos_y = posicoes[i]
-                            if abs(x - pos_x) < 20 and abs(y - pos_y) < 20:
-                                linha = i // 8
-                                coluna = i % 8
-                                if posicao_valida(linha, coluna):
-                                    if tabuleiro[linha][coluna] == ' ':
-                                        tabuleiro[linha][coluna] = jogador_atual
-                                        pecas_brancas_restantes -= 1
-                                        trocar_jogador()
-                                        exibir_tabuleiro()
-                                        pygame.display.flip()
-                                        break
-            else:
-                jogador_atual = 'P'
-        elif jogador_atual == 'P':
-            if pecas_pretas_restantes > 0:
-                jogada = escolher_melhor_jogada(tabuleiro, jogador_atual)
-                if jogada is not None:
-                    linha, coluna = jogada
-                    if tentar_colocar_peca(linha, coluna):
-                        pecas_pretas_restantes -= 1
-                        trocar_jogador()
-                    else:
-                        print("IA: Jogada inválida. Tentando nova jogada...")
-                        jogada_valida = False
-                        while not jogada_valida:
-                            nova_jogada = escolher_melhor_jogada(
-                                tabuleiro, jogador_atual)
-                            if nova_jogada is not None:
-                                nova_linha, nova_coluna = nova_jogada
-                                if tentar_colocar_peca(nova_linha, nova_coluna):
-                                    jogada_valida = True
-                                    pecas_pretas_restantes -= 1
-                                    trocar_jogador()
-                                    print(
-                                        f"IA: Jogada válida na posição ({nova_linha}, {nova_coluna})")
-                            else:
-                                jogada_valida = True
-                                print(
-                                    "IA: Não foi possível realizar uma jogada válida.")
-                                trocar_jogador()
-                    exibir_tabuleiro()
-                    pygame.display.flip()
+            fase_colocacao = False
+            fase_movimentacao = True
+
+        if fase_colocacao:
+            if jogador_atual == 'B':
+                if pecas_brancas_restantes > 0:
+                    for evento in pygame.event.get():
+                        if evento.type == pygame.MOUSEBUTTONDOWN:
+                            x, y = evento.pos
+                            for i in range(24):
+                                pos_x, pos_y = posicoes[i]
+                                if abs(x - pos_x) < 20 and abs(y - pos_y) < 20:
+                                    linha = i // 8
+                                    coluna = i % 8
+                                    if posicao_valida(linha, coluna):
+                                        if tabuleiro[linha][coluna] == ' ':
+                                            tabuleiro[linha][coluna] = jogador_atual
+                                            pecas_brancas_restantes -= 1
+                                            trocar_jogador()
+                                            exibir_tabuleiro()
+                                            pygame.display.flip()
+                                            break
                 else:
-                    print("IA: Não foi possível realizar uma jogada válida.")
+                    jogador_atual = 'P'
+            elif jogador_atual == 'P':
+                if pecas_pretas_restantes > 0:
+                    jogada = escolher_melhor_jogada(tabuleiro, jogador_atual)
+                    if jogada is not None:
+                        linha, coluna = jogada
+                        if tentar_colocar_peca(linha, coluna):
+                            pecas_pretas_restantes -= 1
+                            trocar_jogador()
+                    else:
+                        jogador_atual = 'B'
+                else:
                     jogador_atual = 'B'
-            else:
-                jogador_atual = 'B'
-                jogada = escolher_melhor_jogada(tabuleiro, jogador_atual)
-                if jogada is not None:
-                    linha, coluna = jogada
-                    if tentar_colocar_peca(linha, coluna):
-                        pecas_brancas_restantes -= 1
-                    exibir_tabuleiro()
-                    pygame.display.flip()
-
-    exibir_tabuleiro()
-    pygame.display.flip()
-
-    if pecas_brancas_restantes == 0 and pecas_pretas_restantes == 0:
-        print("Fim do jogo. Ambos os jogadores colocaram todas as peças.")
-
+                    jogada = escolher_melhor_jogada(tabuleiro, jogador_atual)
+                    if jogada is not None:
+                        linha, coluna = jogada
+                        if tentar_colocar_peca(linha, coluna):
+                            pecas_brancas_restantes -= 1
+                            trocar_jogador()
+        elif fase_movimentacao:
+            for evento in pygame.event.get():
+                if evento.type == pygame.MOUSEBUTTONDOWN:
+                    x, y = evento.pos
+                    for i in range(24):
+                        pos_x, pos_y = posicoes[i]
+                        if abs(x - pos_x) < 20 and abs(y - pos_y) < 20:
+                            linha = i // 8
+                            coluna = i % 8
+                            if posicao_valida(linha, coluna):
+                                if tabuleiro[linha][coluna] == jogador_atual:
+                                    linha_destino = linha
+                                    coluna_destino = coluna
+                                else:
+                                    if linha_destino != -1 and coluna_destino != -1:
+                                        if (linha, coluna) in conexoes[linha_destino * 8 + coluna_destino]:
+                                            if tabuleiro[linha][coluna] == ' ':
+                                                tabuleiro[linha][coluna] = jogador_atual
+                                                tabuleiro[linha_destino][coluna_destino] = ' '
+                                                linha_destino = -1
+                                                coluna_destino = -1
+                                                trocar_jogador()
+                    break
     pygame.quit()
 
 
-# Executar o jogo
+# Iniciar o jogo
 jogar()
