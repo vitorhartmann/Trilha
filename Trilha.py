@@ -28,90 +28,107 @@ pecas_pretas_restantes = 9
 jogador_atual = 'B'  # Começa com as peças brancas
 
 posicoes = [
-    # Posições do cubo interno
-    (largura_tela // 2 - 100, altura_tela // 2 - 100),
-    (largura_tela // 2, altura_tela // 2 - 100),
-    (largura_tela // 2 + 100, altura_tela // 2 - 100),
-    (largura_tela // 2 - 100, altura_tela // 2),
-    (largura_tela // 2 + 100, altura_tela // 2),
-    (largura_tela // 2 - 100, altura_tela // 2 + 100),
-    (largura_tela // 2, altura_tela // 2 + 100),
-    (largura_tela // 2 + 100, altura_tela // 2 + 100),
-
-    # Posições do cubo do meio
-    (largura_tela // 2 - 200, altura_tela // 2 - 200),
-    (largura_tela // 2, altura_tela // 2 - 200),
-    (largura_tela // 2 + 200, altura_tela // 2 - 200),
-    (largura_tela // 2 - 200, altura_tela // 2),
-    (largura_tela // 2 + 200, altura_tela // 2),
-    (largura_tela // 2 - 200, altura_tela // 2 + 200),
-    (largura_tela // 2, altura_tela // 2 + 200),
-    (largura_tela // 2 + 200, altura_tela // 2 + 200),
-
     # Posições do cubo externo
-    (largura_tela // 2 - 300, altura_tela // 2 - 300),
-    (largura_tela // 2, altura_tela // 2 - 300),
-    (largura_tela // 2 + 300, altura_tela // 2 - 300),
-    (largura_tela // 2 - 300, altura_tela // 2),
-    (largura_tela // 2 + 300, altura_tela // 2),
-    (largura_tela // 2 - 300, altura_tela // 2 + 300),
-    (largura_tela // 2, altura_tela // 2 + 300),
-    (largura_tela // 2 + 300, altura_tela // 2 + 300)
+    (largura_tela // 2 - 300, altura_tela // 2 - 300),  # 0
+    (largura_tela // 2, altura_tela // 2 - 300),  # 1
+    (largura_tela // 2 + 300, altura_tela // 2 - 300),  # 2
+    
+    # Posições do cubo do meio
+    (largura_tela // 2 - 200, altura_tela // 2 - 200),  # 3
+    (largura_tela // 2, altura_tela // 2 - 200),  # 4
+    (largura_tela // 2 + 200, altura_tela // 2 - 200),  # 5
+    
+    # Posições do cubo interno
+    (largura_tela // 2 - 100, altura_tela // 2 - 100),  # 6
+    (largura_tela // 2, altura_tela // 2 - 100),  # 7
+    (largura_tela // 2 + 100, altura_tela // 2 - 100),  # 8
+    
+    (largura_tela // 2 - 300, altura_tela // 2),  # 9
+    (largura_tela // 2 - 200, altura_tela // 2),  # 10
+    (largura_tela // 2 - 100, altura_tela // 2),  # 11
+    
+    (largura_tela // 2 + 100, altura_tela // 2),  # 12
+    (largura_tela // 2 + 200, altura_tela // 2),  # 13
+    (largura_tela // 2 + 300, altura_tela // 2),  # 14
+    
+    (largura_tela // 2 - 100, altura_tela // 2 + 100), #15
+    (largura_tela // 2, altura_tela // 2 +100), #16
+    
+    
+    (largura_tela // 2 + 100, altura_tela // 2 + 100),  # 17
+    
+    (largura_tela // 2 - 200, altura_tela // 2 + 200),  # 18
+    (largura_tela // 2, altura_tela // 2 + 200),  # 19
+    (largura_tela // 2 + 200, altura_tela // 2 + 200),  # 20
+
+
+    (largura_tela // 2 - 300, altura_tela // 2 + 300),  # 21
+    (largura_tela // 2, altura_tela // 2 + 300),  # 22
+    (largura_tela // 2 + 300, altura_tela // 2 + 300),  # 23
+    
+    
+    
+    
 ]
+
+
 
 
 def desenhar_linhas_cubos():
     # Desenho do tabuleiro, segue a ordem em sentido horário
 
-    # Cubo vermelho (Menor)
-    pygame.draw.lines(tela, VERMELHO, True, [
-                      posicoes[0], posicoes[1], posicoes[2]], 2)  # Linha superior
-    pygame.draw.lines(tela, VERMELHO, True, [
-                      posicoes[2], posicoes[4], posicoes[7]], 2)  # Linha direita
-    pygame.draw.lines(tela, VERMELHO, True, [
-                      posicoes[7], posicoes[6], posicoes[5]], 2)  # Linha inferior
-    pygame.draw.lines(tela, VERMELHO, True, [
-                      posicoes[5], posicoes[3], posicoes[0]], 2)  # Linha esquerda
+    
+    # Linhas Horizontais
 
-    # Cubo azul (Do meio)
     pygame.draw.lines(tela, AZUL, True, [
-                      posicoes[8], posicoes[9], posicoes[10]], 2)  # Linha superior
+                      posicoes[0], posicoes[1], posicoes[2]], 2) 
     pygame.draw.lines(tela, AZUL, True, [
-                      posicoes[10], posicoes[12], posicoes[15]], 2)  # Linha direita
+                      posicoes[3], posicoes[4], posicoes[5]], 2) 
     pygame.draw.lines(tela, AZUL, True, [
-                      posicoes[15], posicoes[14], posicoes[13]], 2)  # Linha inferior
+                      posicoes[6], posicoes[7], posicoes[8]], 2)  
     pygame.draw.lines(tela, AZUL, True, [
-                      posicoes[13], posicoes[11], posicoes[8]], 2)  # Linha esquerda
+                      posicoes[9], posicoes[10], posicoes[11]], 2)
+    pygame.draw.lines(tela, AZUL, True, [
+                      posicoes[12], posicoes[13], posicoes[14]], 2) 
+    pygame.draw.lines(tela, AZUL, True, [
+                      posicoes[15], posicoes[16], posicoes[17]], 2)
+    pygame.draw.lines(tela, AZUL, True, [
+                      posicoes[18], posicoes[19], posicoes[20]], 2)
+    pygame.draw.lines(tela, AZUL, True, [
+                      posicoes[21], posicoes[22], posicoes[23]], 2)
 
-    # Cubo Vermelho (Maior)
-    pygame.draw.lines(tela, BRANCO, True, [
-                      posicoes[16], posicoes[17], posicoes[18]], 2)  # Linha superior
-    pygame.draw.lines(tela, BRANCO, True, [
-                      posicoes[18], posicoes[20], posicoes[23]], 2)  # Linha direita
-    pygame.draw.lines(tela, BRANCO, True, [
-                      posicoes[23], posicoes[22], posicoes[21]], 2)  # Linha inferior
-    pygame.draw.lines(tela, BRANCO, True, [
-                      posicoes[21], posicoes[19], posicoes[16]], 2)  # Linha esquerda
 
-    # Linhas de Ligamento (Em amarelo)
-    pygame.draw.lines(tela, AMARELO, True, [
-                      posicoes[17], posicoes[9], posicoes[1]], 2)  # Linha superior
-    pygame.draw.lines(tela, AMARELO, True, [
-                      posicoes[20], posicoes[12], posicoes[4]], 2)  # Linha direita
-    pygame.draw.lines(tela, AMARELO, True, [
-                      posicoes[22], posicoes[14], posicoes[6]], 2)  # Linha inferior
-    pygame.draw.lines(tela, AMARELO, True, [
-                      posicoes[19], posicoes[11], posicoes[3]], 2)  # Linha esquerda
+    # Linhas Verticais
+
+    pygame.draw.lines(tela, AZUL, True, [
+                      posicoes[0], posicoes[9], posicoes[21]], 2)   
+    pygame.draw.lines(tela, AZUL, True, [
+                      posicoes[3], posicoes[10], posicoes[18]], 2)  
+    pygame.draw.lines(tela, AZUL, True, [
+                      posicoes[6], posicoes[11], posicoes[15]], 2)  
+    pygame.draw.lines(tela, AZUL, True, [
+                      posicoes[1], posicoes[4], posicoes[7]], 2)   
+    pygame.draw.lines(tela, AZUL, True, [
+                      posicoes[16], posicoes[19], posicoes[22]], 2) 
+    pygame.draw.lines(tela, AZUL, True, [
+                      posicoes[8], posicoes[12], posicoes[17]], 2)  
+    pygame.draw.lines(tela, AZUL, True, [
+                      posicoes[5], posicoes[13], posicoes[20]], 2) 
+    pygame.draw.lines(tela, AZUL, True, [
+                      posicoes[2], posicoes[14], posicoes[23]], 2)      
+
+    
+
 
 
 # Função para exibir o tabuleiro
 def exibir_tabuleiro():
     tela.fill(PRETO)
-    desenhar_linhas_cubos()  # Chama a função para desenhar as linhas dos cubos
+    desenhar_linhas_cubos()
 
     for i in range(24):
         pygame.draw.circle(tela, BRANCO, posicoes[i], 20)
-        fonte = pygame.font.Font(None, 50)
+        fonte = pygame.font.Font(None, 30)  # Reduzindo o tamanho da fonte para 30
         linha = i // 8
         coluna = i % 8
 
@@ -123,8 +140,13 @@ def exibir_tabuleiro():
             texto = 'O'
 
         texto_renderizado = fonte.render(texto, True, PRETO)
-        tela.blit(texto_renderizado,
-                  (posicoes[i][0] - 15, posicoes[i][1] - 15))
+        tela.blit(texto_renderizado, (posicoes[i][0] - 12, posicoes[i][1] - 12))  # Reduzindo o deslocamento em 3 pixels
+
+        # Mostrar o número da posição
+        texto_posicao = fonte.render(str(i), True, PRETO)
+        tela.blit(texto_posicao, (posicoes[i][0] - 7, posicoes[i][1] - 7))
+
+
 
     # Exibir mensagem de quem é a vez
     mensagem = f"Vez do jogador {jogador_atual}"
@@ -150,9 +172,9 @@ def posicao_valida(linha, coluna):
     # Verifica se a posição está vazia
     if tabuleiro[linha][coluna] != ' ':
         return False
-    # Verifica se a posição respeita as regras de colocação (por exemplo, não está na linha externa do tabuleiro)
-    # Adicione aqui as regras específicas do seu jogo
-    # ...
+    # Verifica se a posição respeita as regras de colocação (unica regra atual, é quando tem alguma peça lá)
+    # Adicione aqui as regras específicas do jogo
+
     return True
 
 
@@ -184,7 +206,7 @@ def obter_posicoes_disponiveis():
 
 def minimax(tabuleiro, profundidade, maximizando):
     if profundidade == 0 or pecas_brancas_restantes == 0 or pecas_pretas_restantes == 0:
-        # Aqui você deve implementar a função de avaliação da situação do jogo
+        # Implementar aqui a função de avaliação da situação do jogo
         return 0  # Retorna a pontuação atual do tabuleiro
 
     if maximizando:
