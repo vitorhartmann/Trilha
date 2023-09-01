@@ -26,6 +26,7 @@ tabuleiro = [[' ']*8 for _ in range(7)]
 pecas_brancas_restantes = 9
 pecas_pretas_restantes = 9
 jogador_atual = 'B'  # Começa com as peças brancas
+ia_fez_jogada = False
 
 posicoes = [
     # Posições do cubo externo
@@ -143,8 +144,8 @@ def exibir_tabuleiro():
         tela.blit(texto_renderizado, (posicoes[i][0] - 12, posicoes[i][1] - 12))  # Reduzindo o deslocamento em 3 pixels
 
         # Mostrar o número da posição
-        texto_posicao = fonte.render(str(i), True, PRETO)
-        tela.blit(texto_posicao, (posicoes[i][0] - 7, posicoes[i][1] - 7))
+       # texto_posicao = fonte.render(str(i), True, PRETO)
+       # tela.blit(texto_posicao, (posicoes[i][0] - 7, posicoes[i][1] - 7))
 
 
 
@@ -203,6 +204,14 @@ def obter_posicoes_disponiveis():
                 posicoes_disponiveis.append((linha, coluna))
     return posicoes_disponiveis
 
+def posicionar_pecas_pretas_aleatoriamente():
+    global pecas_pretas_restantes
+
+    while pecas_pretas_restantes > 0:
+        linha, coluna = posicao_aleatoria()
+        if tabuleiro[linha][coluna] == ' ':
+            tabuleiro[linha][coluna] = 'P'
+            pecas_pretas_restantes -= 1
 
 def minimax(tabuleiro, profundidade, maximizando):
     if profundidade == 0 or pecas_brancas_restantes == 0 or pecas_pretas_restantes == 0:
@@ -258,7 +267,7 @@ def tentar_colocar_peca(linha, coluna):
 
 # Função principal do jogo
 def jogar():
-    global jogador_atual, pecas_brancas_restantes, pecas_pretas_restantes
+    global jogador_atual, pecas_brancas_restantes, pecas_pretas_restantes, ia_fez_jogada
 
     rodando = True
 
@@ -293,49 +302,26 @@ def jogar():
                                         exibir_tabuleiro()
                                         pygame.display.flip()
                                         break
+                # Marque que a IA ainda não fez sua jogada neste turno
+                ia_fez_jogada = False
             else:
                 jogador_atual = 'P'
         elif jogador_atual == 'P':
-            if pecas_pretas_restantes > 0:
-                jogada = escolher_melhor_jogada(tabuleiro, jogador_atual)
-                if jogada is not None:
-                    linha, coluna = jogada
-                    if tentar_colocar_peca(linha, coluna):
-                        pecas_pretas_restantes -= 1
-                        trocar_jogador()
-                    else:
-                        print("IA: Jogada inválida. Tentando nova jogada...")
-                        jogada_valida = False
-                        while not jogada_valida:
-                            nova_jogada = escolher_melhor_jogada(
-                                tabuleiro, jogador_atual)
-                            if nova_jogada is not None:
-                                nova_linha, nova_coluna = nova_jogada
-                                if tentar_colocar_peca(nova_linha, nova_coluna):
-                                    jogada_valida = True
-                                    pecas_pretas_restantes -= 1
-                                    trocar_jogador()
-                                    print(
-                                        f"IA: Jogada válida na posição ({nova_linha}, {nova_coluna})")
-                            else:
-                                jogada_valida = True
-                                print(
-                                    "IA: Não foi possível realizar uma jogada válida.")
-                                trocar_jogador()
+            if pecas_pretas_restantes > 0 and not ia_fez_jogada:
+                # Posicione uma peça preta da IA aleatoriamente
+                linha, coluna = posicao_aleatoria()
+                if posicao_valida(linha, coluna):
+                    tabuleiro[linha][coluna] = 'P'
+                    pecas_pretas_restantes -= 1
+                    trocar_jogador()
                     exibir_tabuleiro()
                     pygame.display.flip()
-                else:
-                    print("IA: Não foi possível realizar uma jogada válida.")
-                    jogador_atual = 'B'
+                    # Marque que a IA fez sua jogada neste turno
+                    ia_fez_jogada = True
             else:
                 jogador_atual = 'B'
-                jogada = escolher_melhor_jogada(tabuleiro, jogador_atual)
-                if jogada is not None:
-                    linha, coluna = jogada
-                    if tentar_colocar_peca(linha, coluna):
-                        pecas_brancas_restantes -= 1
-                    exibir_tabuleiro()
-                    pygame.display.flip()
+                # Lógica para o jogador B ou outra lógica da IA
+                # ...
 
     exibir_tabuleiro()
     pygame.display.flip()
@@ -344,6 +330,7 @@ def jogar():
         print("Fim do jogo. Ambos os jogadores colocaram todas as peças.")
 
     pygame.quit()
+
 
 
 # Executar o jogo
